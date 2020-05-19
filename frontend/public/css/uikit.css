@@ -7230,10 +7230,13 @@ ul.uk-nav-sub {
   height: 100%;
 }
 
+/* 100% - nav height */
 .uk-height-1-nav {
-  height: calc(100% - 90px);
+  height: calc(100% - 110px);
 }
 
+
+/* 100% - text height */
 .uk-height-1-text {
   height: calc(100% - 130px);
 }

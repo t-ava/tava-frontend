@@ -208,7 +208,7 @@ function autocomplete(arr) {
        getTargets(getArrivalTime);
      }
      catch (error) {
-       UIkit.notification({message: '정류장 정보를 다시 한 번 확인해주세요.', status: 'danger', pos: 'bottom-center'});
+       UIkit.notification({message: 'Please check your station name.', status: 'danger', pos: 'bottom-center'});
        event.preventDefault();
        document.getElementById("body2").style.display="none";
        document.getElementById("emptydiv").style.display="none";
@@ -230,7 +230,7 @@ function autocomplete(arr) {
          allowance(userAddr, userAddr, contractAddr).done(function(msg){
            console.log(msg);
            rentBike(userAddr, departure[2], Math.round((new Date()).getTime()/1000));
-           rentbutton.innerHTML = "결제";
+           rentbutton.innerHTML = "Pay";
          });
        }, 3000);
      });
@@ -241,16 +241,17 @@ function autocomplete(arr) {
      rentTime(userAddr, userAddr).done(function(msg){
        // No rent
        if (msg.data.res[0] == 0) {
-         alert("대여한 이력이 없습니다!")
+         alert("No rental history!")
        } else {
          // rent => return
          var returnTime = Math.round((new Date()).getTime()/1000);
-         var returnStation = prompt("반납 대여소 번호를 입력해주세요", "");
+         var returnStation = prompt("Please input the arrival station id", "");
          console.log(returnStation);
          returnBike(userAddr, returnStation, returnTime).done(function(msg){
-           requestIncentive(userAddr, returnTime, returnStation, 0, infos);
+	   // [TODO] AVA 에서 미구현
+           //requestIncentive(userAddr, returnTime, returnStation, 0, infos);
          });
-         alert(returnStation + "번 정거장에 반납합니다.");
+         alert("Return to #" + returnStation + " station.");
          refresh();
        }
      })
@@ -304,8 +305,13 @@ function autocomplete(arr) {
   function sendPredictTx(targetIDs, travelTimes, callback) {
     console.log("5. Send predict tx with timestamp [todo]");
     var reqTime = Math.round((new Date()).getTime()/1000);
-    requestPredict(userAddr, reqTime, targetIDs, travelTimes, infos, callback);
-    //callback(departure, targets, updateMap);
+    // [TODO] AVA 미구현이므로 result 대충 다 1로 푸시하고 renderMap 해보기
+    for (var i = 0; i < targets.length; i++) {
+      targets[i].push(1);
+    }
+    renderMap();
+    console.log("targets:", targets)
+    //requestPredict(userAddr, reqTime, targetIDs, travelTimes, infos, callback);
   }
 
   // < Get reply tx and update map>
@@ -315,6 +321,7 @@ function autocomplete(arr) {
     for (var i = 0; i < targets.length; i++) {
       targets[i].push(data.data.res[2][i]);
     }
+    // 이 콜백이 updateMap() 임
     callback();
   }
 
@@ -403,6 +410,24 @@ function autocomplete(arr) {
     });
   }
 
+  // 일단 ajax없이 지도 렌더해보기 위함 
+  function renderMap() {
+    let lat_center = parseFloat(targets[0][6]);                 
+    let long_center = parseFloat(targets[0][7]);                                                                       
+    // 지도 중심 이동                           
+    mymap.setView([lat_center,long_center], 14);     
+    // Render
+    mapboxgl.accessToken = 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzdzdqbHUxIn0.0eLBipR8sNJ87SU2xJGSOA';
+    var map = new mapboxgl.Map({
+        container: 'mapid',
+	// 이 style 부분에서 이전에 id, z, x, y 설정했던것처럼 설정해주는 것 같기도 하고 모르겠땅
+        style: 'mapbox://styles/mapbox/streets-v11'
+    });
+    markersLayer.clearLayers();
+    //mymap.spin(true);
+    updateMap()
+  }
+
   function requestPredict(from, reqTime, targetIDs, travelTimes, infos, callback) {
     var querydata = '{"from": "' + from + '","inputs": {"_reqTime": "'
           + reqTime + '","_stations": [' + targetIDs + '],"_arriveTimes": [' + travelTimes + '],"_infos": [' + infos + ']}}';
@@ -432,7 +457,8 @@ function autocomplete(arr) {
             maxZoom: 18,
             id: 'mapbox.streets',
             // 용환 mapbox public accesToken (이대로 두면 됨)
-            accessToken: 'pk.eyJ1IjoiZXJpYy15b28iLCJhIjoiY2swMG45M29uMDVjNzNtbGs3Zm01ODVlaiJ9.xUr6rCrxrGVEsaV-vf7fFw'
+	    // 2020.05.19 yeonjae
+            accessToken: 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzdzdqbHUxIn0.0eLBipR8sNJ87SU2xJGSOA'
           }).addTo(mymap);
           markersLayer.clearLayers();
           mymap.spin(true);
@@ -741,6 +767,8 @@ function queryInfos() {
    });
 }
 
+/* Google Login */
+
 document.getElementById("userProfileButton").style.visibility = "hidden";
   document.getElementById("signInButton").style.visibility = "visible";
   var signedInFlag = false;
@@ -764,7 +792,7 @@ document.getElementById("userProfileButton").style.visibility = "hidden";
   };
   function checkIfSignedIn(){
     if(sessionStorage.getItem('myUserEntity') == null){
-      alert("로그인이 필요합니다.");
+      alert("Please sign-in.");
       return false;
     } else {
       return true;
@@ -782,6 +810,7 @@ document.getElementById("userProfileButton").style.visibility = "hidden";
     document.getElementById("signInButton").style.display = "";
     document.getElementById("offcanvas-flip").style.display = "none";
   }
+
 function timeStampToTime(timestamp) {
   var date = new Date(parseInt(timestamp)*1000);
   var year = date.getFullYear();
