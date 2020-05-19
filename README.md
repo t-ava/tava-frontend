@@ -1,2 +1,4 @@
-# Ava-RL-anche
-Avalanche based blockchain simulator using Reinforcement Learning
+# :bike:Tavalanche
+> Avalanche based blockchain simulator using Reinforcement Learning
+
+![](images/preview.gif)
