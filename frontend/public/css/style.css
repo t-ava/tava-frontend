@@ -1,4 +1,15 @@
+/*
+ * font-family: 'Josefin Sans', sans-serif; font-weight: 300, 700; font-style: italic
+ * font-family: 'Josefin Slab', serif; font-weight: 400, 700; font-style: italic
+ * font-family: 'Open Sans', sans-serif; font-weight: 300, 800; font-style: italic
+ * font-family: 'Roboto', sans-serif; font-weight: 100, 300
+ * font-family: 'Ubuntu', sans-serif; font-weight: 700; font-style: italic
+ */
 * {
-  font-family: 'Roboto', sans-serif;
-  font-weight: 100;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 300;
+}
+
+.spacing_text {
+  letter-spacing: 5px;
 }
