@@ -17,7 +17,7 @@ queryInfos();
  * Retrieved from http://jsfiddle.net/e6220t92/2/
  */
 var mymap = L.map('mapid');
-const fileUrl = '../src/stations.csv' // provide file location
+const fileUrl = '../src/citibike_stations.csv' // provide file location
 fetch(fileUrl)
    .then( r => r.text() )
    .then( t => CSVToArray(t) )
