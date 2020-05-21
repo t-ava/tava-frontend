@@ -1,4 +1,10 @@
 /*
+ * Mapbox token
+ */
+mapboxgl.accessToken = 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzdzdqbHUxIn0.0eLBipR8sNJ87SU2xJGSOA';
+var map;
+
+/*
  * REOA Addresses for test
  */
 var userAddr = '0x408306bca6f0b15da485d8009cb0e12dfe0ef28c';
@@ -16,7 +22,6 @@ queryInfos();
  * Read station data
  * Retrieved from http://jsfiddle.net/e6220t92/2/
  */
-var mymap = L.map('mapid');
 const fileUrl = '../src/citibike_stations.csv' // provide file location
 fetch(fileUrl)
    .then( r => r.text() )
@@ -326,23 +331,20 @@ function autocomplete(arr) {
   }
 
   var firstMarker;
-  var markersLayer = new L.LayerGroup();
 
   // Update map
   function updateMap() {
-
-    mymap.spin(false);
     // 마커 추가
     for (var i=0;i<targets.length;i++) {
-      var marker = L.marker(targets[i].slice(6,8));
-      marker.bindPopup(targets[i][2] + '. ' + targets[i][3] + '\n'
-                        + '<span class\="uk-label\" style=\"background-color:#ffd250;color:#000;\"><span uk-icon=\"bolt\"></span>'+targets[i][8]+'</span>');
-      if (i==0) firstMarker = marker;
-      markersLayer.addLayer(marker);
+	    // 위도. 경도 순서가 반대넹
+	    var marker = new mapboxgl.Marker()
+		    .setLngLat([targets[i][7], targets[i][6]])
+		    .setPopup(new mapboxgl.Popup().setHTML('<span style="text-align:center;">' + targets[i][2] + '. ' + targets[i][3] + '</span>'
+		                            + '<br/><span class\="uk-label\" style=\"background-color:#ffd250;color:#000; text-align:center;\"><span uk-icon=\"bolt\"></span>'+targets[i][8]+'</span>'))
+		    .addTo(map);
+	    if (i==0) firstMarker = marker;
     }
-    markersLayer.addTo(mymap);
-    firstMarker.openPopup();
-
+    firstMarker.togglePopup();
     console.log("7. update map");
     // 여기에서 Targets 정류장을 지도에 표시
     // targets[0]~targets[9] 까지 있음 (목적지 + 목적지와 가까운 정류장 9개)
@@ -414,17 +416,13 @@ function autocomplete(arr) {
   function renderMap() {
     let lat_center = parseFloat(targets[0][6]);                 
     let long_center = parseFloat(targets[0][7]);                                                                       
-    // 지도 중심 이동                           
-    mymap.setView([lat_center,long_center], 14);     
-    // Render
     mapboxgl.accessToken = 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzdzdqbHUxIn0.0eLBipR8sNJ87SU2xJGSOA';
-    var map = new mapboxgl.Map({
+    map = new mapboxgl.Map({
         container: 'mapid',
-	// 이 style 부분에서 이전에 id, z, x, y 설정했던것처럼 설정해주는 것 같기도 하고 모르겠땅
-        style: 'mapbox://styles/mapbox/streets-v11'
+        style: 'mapbox://styles/mapbox/streets-v11',
+	center: [long_center, lat_center],
+	zoom: 14
     });
-    markersLayer.clearLayers();
-    //mymap.spin(true);
     updateMap()
   }
 
@@ -442,27 +440,21 @@ function autocomplete(arr) {
         processData: false,
         data: querydata,
         success: function (data) {
-          //console.log(JSON.stringify(data));
-          // [for test] insert response
-          // insertResponse(ownerAddr, reqTime, targetIDs, callback);
           // get Response
           // 지도 초기화
           // 지도 중심 계산
           let lat_center = parseFloat(targets[0][6]);
           let long_center = parseFloat(targets[0][7]);
-          // 지도 중심 이동
-          mymap.setView([lat_center,long_center], 14);
+	  /*
+	  // No more use leaflet (L.~)
           L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
             maxZoom: 18,
             id: 'mapbox.streets',
-            // 용환 mapbox public accesToken (이대로 두면 됨)
 	    // 2020.05.19 yeonjae
             accessToken: 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzdzdqbHUxIn0.0eLBipR8sNJ87SU2xJGSOA'
-          }).addTo(mymap);
-          markersLayer.clearLayers();
-          mymap.spin(true);
-
+          }).addTo(map);
+	  */
           setTimeout(function () {getResponse(userAddr, reqTime, callback)}, 3000);
         },
         error: function(){
