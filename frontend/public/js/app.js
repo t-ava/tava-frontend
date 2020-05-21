@@ -33,6 +33,8 @@ fetch(fileUrl)
  * Add Go() button event listener here
  */
 function autocomplete(arr) {
+  // arr : ["id", "name", "latitude", "longitude"]
+  const ID = 0, NAME = 1, LAT = 2, LONG = 3, INCENTIVE = 4;
   var input = document.getElementsByClassName("autocomplete-input")
   var optionsVal = document.getElementsByClassName("autocomplete-list")
 
@@ -69,8 +71,8 @@ function autocomplete(arr) {
 
           for (var i = 1; i < arr.length; i++) {
               //var testableRegExp = new RegExp(RegExp.escape(textCountry), "i");
-              if (arr[i][3].match(textCountry)) {
-                  addValue(arr[i][3], arr[i][3], idx);
+              if (arr[i][NAME].match(textCountry)) {
+                  addValue(arr[i][NAME], arr[i][NAME], idx);
               }
           }
       }
@@ -125,7 +127,7 @@ function autocomplete(arr) {
           closeAllSelect(this);
           this.nextSibling.classList.toggle("select-hide");
           this.classList.toggle("select-arrow-active");
-          input[idx].value = this.innerHTML;
+          input[idx].value = $(this).text();
         });
 
       function closeAllSelect(elmnt) {
@@ -273,10 +275,10 @@ function autocomplete(arr) {
   function getTargets(callback) {
     console.log("2. Get targets (top 10 closest stations)");
     for (var i = 0; i < arr.length; i++) {
-        if (arr[i][3] == input[0].value) {
+        if (arr[i][NAME] == input[0].value) {
             departure = arr[i];
         }
-        if (arr[i][3] == input[1].value) {
+        if (arr[i][NAME] == input[1].value) {
             arrival = arr[i];
             targets = getCloseStations(i, 10) // Get top 10 close stations from here
         }
@@ -291,7 +293,7 @@ function autocomplete(arr) {
     var targetIDs = [];
     var travelTimes = [];
     for (var i = 0; i < targets.length; i++) {
-      targetIDs.push(targets[i][2]);
+      targetIDs.push(targets[i][ID]);
       travelTimes.push(getTravelTimeHour(departure, targets[i]));
     }
     console.log(targetIDs, travelTimes);
@@ -310,9 +312,9 @@ function autocomplete(arr) {
   function sendPredictTx(targetIDs, travelTimes, callback) {
     console.log("5. Send predict tx with timestamp [todo]");
     var reqTime = Math.round((new Date()).getTime()/1000);
-    // [TODO] AVA 미구현이므로 result 대충 다 1로 푸시하고 renderMap 해보기
+    // [TODO] AVA 미구현이므로 result 대충 다 999로 푸시하고 renderMap 해보기
     for (var i = 0; i < targets.length; i++) {
-      targets[i].push(1);
+      targets[i].push(999);
     }
     renderMap();
     console.log("targets:", targets)
@@ -338,9 +340,9 @@ function autocomplete(arr) {
     for (var i=0;i<targets.length;i++) {
 	    // 위도. 경도 순서가 반대넹
 	    var marker = new mapboxgl.Marker()
-		    .setLngLat([targets[i][7], targets[i][6]])
-		    .setPopup(new mapboxgl.Popup().setHTML('<span style="text-align:center;">' + targets[i][2] + '. ' + targets[i][3] + '</span>'
-		                            + '<br/><span class\="uk-label\" style=\"background-color:#ffd250;color:#000; text-align:center;\"><span uk-icon=\"bolt\"></span>'+targets[i][8]+'</span>'))
+		    .setLngLat([targets[i][LONG], targets[i][LAT]])
+		    .setPopup(new mapboxgl.Popup().setHTML('<span style="text-align:center;">' + targets[i][ID] + '. ' + targets[i][NAME] + '</span>'
+		                            + '<br/><span class\="uk-label\" style=\"background-color:#ffd250;color:#000; text-align:center;\"><span uk-icon=\"bolt\"></span>'+targets[i][INCENTIVE]+'</span>'))
 		    .addTo(map);
 	    if (i==0) firstMarker = marker;
     }
@@ -361,11 +363,11 @@ function autocomplete(arr) {
   // Get N closest stations from arr_index
   function getCloseStations(index, n) {
     var target = arr[index]; // arrival station
-    // only iterate 100
-    var searchStart = ((index-50) > 0) ? index-50 : 1;
-    var searchEnd = ((index+50) <= arr.length-1) ? index+50 : arr.length-1;
     var distances = [];
-    for (var i = searchStart; i <= searchEnd; i++) {
+    for (var i = 1; i < arr.length; i++) {
+      if (i == index) {
+	      continue;
+      }
       // get distance [km]
       distances.push([computeDistance(arr[i],target),i])
     }
@@ -374,7 +376,8 @@ function autocomplete(arr) {
     });
 
     targets = [];
-    for (var i = 0; i < n; i++) {
+    targets.push(arr[index]); // destination
+    for (var i = 0; i < n-1; i++) {
       targets.push(arr[distances[i][1]]);
     }
     return targets;
@@ -414,8 +417,8 @@ function autocomplete(arr) {
 
   // 일단 ajax없이 지도 렌더해보기 위함 
   function renderMap() {
-    let lat_center = parseFloat(targets[0][6]);                 
-    let long_center = parseFloat(targets[0][7]);                                                                       
+    let lat_center = parseFloat(targets[0][LAT]);
+    let long_center = parseFloat(targets[0][LONG]);                                                                       
     mapboxgl.accessToken = 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzdzdqbHUxIn0.0eLBipR8sNJ87SU2xJGSOA';
     map = new mapboxgl.Map({
         container: 'mapid',
@@ -443,8 +446,8 @@ function autocomplete(arr) {
           // get Response
           // 지도 초기화
           // 지도 중심 계산
-          let lat_center = parseFloat(targets[0][6]);
-          let long_center = parseFloat(targets[0][7]);
+          let lat_center = parseFloat(targets[0][LAT]);
+          let long_center = parseFloat(targets[0][LONG]);
 	  /*
 	  // No more use leaflet (L.~)
           L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {

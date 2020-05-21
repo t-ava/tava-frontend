@@ -2,12 +2,15 @@
  * Util functions
  */
 
+// arr : ["id", "name", "latitude", "longitude"]
+const LAT = 2, LONG = 3;
+
 // ref: https://m.blog.naver.com/javaking75/220342410214
 function computeDistance(startCoords, destCoords) {
-    var startLatRads = degreesToRadians(startCoords[6]);
-    var startLongRads = degreesToRadians(startCoords[7]);
-    var destLatRads = degreesToRadians(destCoords[6]);
-    var destLongRads = degreesToRadians(destCoords[7]);
+    var startLatRads = degreesToRadians(startCoords[LAT]);
+    var startLongRads = degreesToRadians(startCoords[LONG]);
+    var destLatRads = degreesToRadians(destCoords[LAT]);
+    var destLongRads = degreesToRadians(destCoords[LONG]);
 
     var Radius = 6371; //지구의 반경(km)
     var distance = Math.acos(Math.sin(startLatRads) * Math.sin(destLatRads) +
