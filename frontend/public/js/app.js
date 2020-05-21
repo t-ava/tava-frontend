@@ -357,7 +357,7 @@ function autocomplete(arr) {
 
     // Set departure info
     document.getElementById("departure").innerHTML =
-    "<B>[" + departure[2] + ". " + departure[3] + "]</B>" + "<br />" + departure[4];
+    "<B>[" + departure[ID] + ". " + departure[NAME] + "]</B>";
   }
 
   // Get N closest stations from arr_index
