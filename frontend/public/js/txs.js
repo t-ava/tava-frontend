@@ -3,18 +3,26 @@
  */
  var version = '3';
 
+ var FEE = 10;
+
+ var OWNER_ADDR = 'X-JA6XmBq36MCy97Xi8kYBGbvu1B8Nhruxb';
+ var OWNER_KEY = '27v9G1abBD39z5S8P1A2oQHKMK5ND7JxfzKg2nHi7yxJv3rQ82';
+ var OWNER_NAME = 'user1';
+ var OWNER_PASSWORD = 'jsdkbCJKEDleoi';
+
+ var NODE = 'http://satoshi.snu.ac.kr:9650/ext/bc/X';
+
 /*
  * 유저가 자전거를 하나 빌린다
  * 유저가 기본 렌트비를 지불
+ * bike token은 그쪽에서 저절로 해주는거 아닌거면 내가 여기서 해야되는건가
  */
-function rentBike(from, stationID, time) {
-  var querydata = '{"from": "' + from + '", "inputs": {"stationID": "' + stationID + '", "rentTime": "' + time + '"}}'
+function rentBike(fromname, password, stationID, time) {
+  //var querydata = '{"from": "' + from + '", "inputs": {"stationID": "' + stationID + '", "rentTime": "' + time + '"}}'
+  var querydata = '{"jsonrpc": "2.0", "id": 3, "method": "avm.send", "params": {"assetID": "AVA", "amount" :' + FEE + ', "to": "' + OWNER_ADDR + '", "username": "' + fromname + '", "password": "' + password + '"}}';
   console.log("Rent Bike", querydata);
   return $.ajax({
-      url: "https://api.luniverse.net/tx/v1.0/transactions/rentBike" + version,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-      },
+      url: NODE,
       type: 'POST',
       contentType: 'application/json',
       processData: false,
@@ -53,58 +61,6 @@ function returnBike(from, stationID, time) {
       success: function (data) {
         console.log(JSON.stringify(data));
         alert("반납에 성공했습니다.");
-      },
-      error: function(code) {
-        console.log(code);
-        alert("FAIL");
-      }
-  });
-}
-
-/*
- * 유저가 이 트젝을 보내 컨트렉에게 user의 돈을 움직일 권한을 줌
- */
-function approve(from, amount, spender) {
-  var querydata = '{"from": "' + from + '", "inputs": {"valueAmount": "' + amount + '", "spender": "' + spender + '"}}'
-  console.log("Approve", querydata);
-  return $.ajax({
-      url: "https://api.luniverse.net/tx/v1.0/transactions/approve",
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-      },
-      type: 'POST',
-      contentType: 'application/json',
-      processData: false,
-      data: querydata,
-      success: function (data) {
-        console.log(JSON.stringify(data));
-        //alert("SUCCESS");
-      },
-      error: function(code) {
-        console.log(code);
-        alert("FAIL");
-      }
-  });
-}
-
-/*
- * 컨트렉이 돈을 움직일 권한을 받았는지 확인
- */
-function allowance(from, owner, spender) {
-  var querydata = '{"from": "' + from + '", "inputs": {"owner": "' + owner + '", "spender": "' + spender + '"}}'
-  console.log("Allowance", querydata);
-  return $.ajax({
-      url: "https://api.luniverse.net/tx/v1.0/transactions/allowance",
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-      },
-      type: 'POST',
-      contentType: 'application/json',
-      processData: false,
-      data: querydata,
-      success: function (data) {
-        console.log(JSON.stringify(data));
-        //alert("SUCCESS");
       },
       error: function(code) {
         console.log(code);

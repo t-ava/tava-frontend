@@ -5,12 +5,12 @@ mapboxgl.accessToken = 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzd
 var map;
 
 /*
- * REOA Addresses for test
+ * User for test
  */
-var userAddr = '0x408306bca6f0b15da485d8009cb0e12dfe0ef28c';
-var ownerAddr = '0x128a8b8c9507aec53d949c53d5be57c4d98f9256';
-var contractAddr = '0xaa7De5581188449339058e5908fC0B06e61db3f9';
-var version = '3';
+const USER_ADDR = 'X-MQPjxgthpTkXS8c3RAEJWtbTSZciULC8N';
+const USER_KEY = '2eEqN4Zsn5z3Qy13RjdAuxUoa8J2dXD6Zo9vS2osY68DLT6Y8E';
+const USER_NAME = 'user2';
+const USER_PASSWORD = 'KDFNEobckav';
 
 /*
  * Query weather & date infos
@@ -231,16 +231,7 @@ function autocomplete(arr) {
    document.getElementById("rent").addEventListener("click", function(e) {
      rentbutton = this;
      rentbutton.innerHTML = '<div id="spinner" uk-spinner></div>';
-     approve(userAddr, 100000000000000, contractAddr).done(function(msg){
-       console.log(msg);
-       setTimeout(function() {
-         allowance(userAddr, userAddr, contractAddr).done(function(msg){
-           console.log(msg);
-           rentBike(userAddr, departure[2], Math.round((new Date()).getTime()/1000));
-           rentbutton.innerHTML = "Pay";
-         });
-       }, 3000);
-     });
+     rentBike(USER_NAME, USER_PASSWORD, departure[ID], Math.round((new Date()).getTime()/1000));
    });
 
    // return button listener
