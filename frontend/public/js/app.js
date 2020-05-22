@@ -7,10 +7,10 @@ var map;
 /*
  * User for test
  */
-const USER_ADDR = 'X-MQPjxgthpTkXS8c3RAEJWtbTSZciULC8N';
-const USER_KEY = '2eEqN4Zsn5z3Qy13RjdAuxUoa8J2dXD6Zo9vS2osY68DLT6Y8E';
-const USER_NAME = 'user2';
-const USER_PASSWORD = 'KDFNEobckav';
+const USER_ADDR = 'X-PW2Bkxj4Hyc52o1AugXfP4FtLkyqM6qc7';
+const USER_KEY = 'trUedHL6UDGLgv93yo6EcJ2UZiWhbiHjMCDU2ffJs9PcXvv3h';
+const USER_NAME = 'user1';
+const USER_PASSWORD = 'KDFNEobasfdkav-042!05';
 
 /*
  * Query weather & date infos

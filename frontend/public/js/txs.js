@@ -4,10 +4,11 @@
  const FEE = 10;
  const WAIT_TIME = 2000;
 
- const OWNER_ADDR = 'X-JA6XmBq36MCy97Xi8kYBGbvu1B8Nhruxb';
- const OWNER_KEY = '27v9G1abBD39z5S8P1A2oQHKMK5ND7JxfzKg2nHi7yxJv3rQ82';
- const OWNER_NAME = 'user1';
- const OWNER_PASSWORD = 'jsdkbCJKEDleoi';
+ const OWNER_ADDR = 'X-MQPjxgthpTkXS8c3RAEJWtbTSZciULC8N';
+ const OWNER_KEY = '2eEqN4Zsn5z3Qy13RjdAuxUoa8J2dXD6Zo9vS2osY68DLT6Y8E';
+ const OWNER_NAME = 'host';
+ const OWNER_PASSWORD = 'KDFNEobckav';
+ const BIKE_TOKEN_ID = '5nxSnt6DQfBmdfPKEwHqBr8vkDeY48g2UbRSCyenvim4RLkqg';
 
  const NODE = 'http://satoshi.snu.ac.kr:9650/ext/bc/X';
 
@@ -22,6 +23,18 @@
  */
 function sendAsset(amount, assetID, to, username, password) {
   var querydata = '{"jsonrpc": "2.0", "id": 3, "method": "avm.send", "params": {"assetID": "' + assetID + '", "amount" :' + amount + ', "to": "' + to + '", "username": "' + username + '", "password": "' + password + '"}}';
+  console.log("Send Asset", querydata);
+  return $.ajax({
+    url: NODE,
+    type: 'POST',
+    contentType: 'application/json',
+    processData: false,
+    data: querydata
+  });
+}
+
+function sendAssetFrom(amount, assetID, to, username, password, from) {
+  var querydata = '{"jsonrpc": "2.0", "id": 3, "method": "avm.sendFrom", "params": {"assetID": "' + assetID + '", "amount" :' + amount + ', "to": "' + to + '", "username": "' + username + '", "password": "' + password + '", "from": "' + from + '"}}';
   console.log("Send Asset", querydata);
   return $.ajax({
     url: NODE,
@@ -75,7 +88,6 @@ function getBalance(address, assetID) {
  * [TODO] Time 같은건 내쪽 DB에서 갖고있는게 맞을거같다.. 여기서 리턴되는 txID 랑 함께 시간을 기록해놔야 히스토리탭도 만들고, 나중에 리턴할때 추가 렌트비도 청구할 수 있음
  */
 function rentBike(useraddr, username, password, stationID, time) {
-  var assetID = '2FDj1tDPT57bdfHPQv6y9GzjHEaejVxmniJvC2Vhubpe27TGTt'; // ST0 Token. [TODO] stationID 통해서 받아올 것
   // 유저가 기본 렌트비를 지불
   sendAsset(FEE, "AVA", OWNER_ADDR, username, password)
     .done(function(data) {
@@ -91,7 +103,8 @@ function rentBike(useraddr, username, password, stationID, time) {
 	  var txStatus = data["result"]["status"];
 	  if (txStatus == "Accepted") {
             // 잘 처리되었으므로, 이제 owner가 bike token을 지급
-            sendAsset(1, assetID, useraddr, OWNER_NAME, OWNER_PASSWORD)
+	    // [TODO] 지금은 그냥 1에서 보낸다고 상정 
+            sendAssetFrom(1, BIKE_TOKEN_ID, useraddr, OWNER_NAME, OWNER_PASSWORD, 'X-MUSeJpBshrLfonHN674mozTyUMuHkevkV')
               .done(function (data) {
                 if (data["result"] === undefined) {
                   alert("FAIL!\nERROR CODE: rentBike-2");
@@ -123,7 +136,6 @@ function rentBike(useraddr, username, password, stationID, time) {
  * 오너가 인센티브를 지급
  */
 function returnBike(useraddr, username, password, stationID, additional_fee, incentive) {
-  var assetID = '2LFqoMJHmGPL136DNPnmwCTzD96gp1CjRoEfSeZt2Xc5HnsCax'; // ST1 Token. [TODO] stationID 통해서 받아올 것
   // 유저가 추가 렌트비를 지불
   sendAsset(additional_fee, "AVA", OWNER_ADDR, username, password)
     .done(function(data) {
@@ -140,7 +152,8 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
 	  if (txStatus == "Accepted") {
 	    setHistory(useraddr, 'return', additional_fee, Math.round((new Date()).getTime()/1000));
             // 잘 처리되었으므로, 이제 bike token을 반환
-            sendAsset(1, assetID, OWNER_ADDR, username, password)
+	    // [TODO] 지금은 2에 반납한다고 상정 
+            sendAsset(1, BIKE_TOKEN_ID, 'X-5vnaaAgRUXnEnw45KWUua5yk6N8sA81HZ', username, password)
               .done(function (data) {
                 if (data["result"] === undefined) {
                   alert("FAIL!\nERROR CODE: returnBike-2");
