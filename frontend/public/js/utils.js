@@ -145,13 +145,6 @@ function showbody2() {
   document.getElementById("body2").style.display="";
 }
 
-function updateBalance(userAddr) {
-  getBalance(userAddr, "AVA").done(function(data){
-      console.log(data);
-      document.getElementById("balance").textContent = data["result"]["balance"];
-    });
-}
-
 // Refresh
 function refresh(userAddr) {
   getHistory(userAddr).done(function(msg) {
@@ -159,6 +152,14 @@ function refresh(userAddr) {
     updateHistory(msg);
   });
   updateBalance(userAddr);
+}
+
+// Update Balance
+function updateBalance(userAddr) {
+  getBalance(userAddr, "AVA").done(function(data){
+      console.log(data);
+      document.getElementById("balance").textContent = data["result"]["balance"];
+    });
 }
 
 // Update mypage history

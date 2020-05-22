@@ -1,8 +1,6 @@
 /*
  * Transactions
  */
- var version = '3';
-
  const FEE = 10;
  const WAIT_TIME = 2000;
 
@@ -12,13 +10,6 @@
  const OWNER_PASSWORD = 'jsdkbCJKEDleoi';
 
  const NODE = 'http://satoshi.snu.ac.kr:9650/ext/bc/X';
-
-
-/*
- * 딱 id = 1,2, 3,4 함수 구현한 다음에 
- * rentBike returnBike이런건 ajax.done() ajax.fail() 이걸로 구현하자
- */
-
 
 /*
  * [sendAsset]
@@ -155,7 +146,6 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
                   alert("FAIL!\nERROR CODE: returnBike-2");
 	          return;
                 }
-		console.log("data!!!!!", data);
                 var txID = data["result"]["txID"];
                 setTimeout(function () {
                   getTxStatus(txID).done(function(data) {
