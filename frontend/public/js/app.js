@@ -236,23 +236,16 @@ function autocomplete(arr) {
 
    // return button listener
    document.getElementById("return").addEventListener("click", function(e) {
-     rentTime(userAddr, userAddr).done(function(msg){
-       // No rent
-       if (msg.data.res[0] == 0) {
-         alert("No rental history!")
-       } else {
-         // rent => return
-         var returnTime = Math.round((new Date()).getTime()/1000);
-         var returnStation = prompt("Please input the arrival station id", "");
-         console.log(returnStation);
-         returnBike(userAddr, returnStation, returnTime).done(function(msg){
-	   // [TODO] AVA 에서 미구현
-           //requestIncentive(userAddr, returnTime, returnStation, 0, infos);
-         });
-         alert("Return to #" + returnStation + " station.");
-         refresh();
-       }
-     })
+     // [TODO] No rent handling ("No rental history!") using rentTime (0, else)
+     var returnTime = Math.round((new Date()).getTime()/1000);
+     var returnStationID = prompt("Please input the arrival station id", "");
+     // [TODO] time을 통해 추가요금을, requestIncentive 를 통해 incentive를 구하기
+     // requestIncentive(userAddr, returnTime, returnStation, 0, infos);
+     var additionalFee = 7;
+     var incentive = 4;
+     returnBike(USER_ADDR, USER_NAME, USER_PASSWORD, returnStationID, additionalFee, incentive)
+     // [TODO] refresh
+     //refresh();
    });
 
    // refresh button listener
