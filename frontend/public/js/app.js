@@ -231,7 +231,7 @@ function autocomplete(arr) {
    document.getElementById("rent").addEventListener("click", function(e) {
      rentbutton = this;
      rentbutton.innerHTML = '<div id="spinner" uk-spinner></div>';
-     rentBike(USER_NAME, USER_PASSWORD, departure[ID], Math.round((new Date()).getTime()/1000));
+     rentBike(USER_ADDR, USER_NAME, USER_PASSWORD, departure[ID], Math.round((new Date()).getTime()/1000));
    });
 
    // return button listener
