@@ -145,19 +145,26 @@ function showbody2() {
   document.getElementById("body2").style.display="";
 }
 
-function updateBalance() {
-  balanceOf(userAddr, userAddr).done(function(msg){
-      console.log(msg);
-      document.getElementById("balance").textContent = msg.data.res[0];
+// 여기 userAddr 대신 USER_ADDR 쓰게 해야되는데 이 함수 위치를 어디로 이동하는게 적절할지 생각해보장 ..
+// 왜 얘만 이렇게했지 함수구현을.. 다른애들처럼 클릭했을때 핸들러로 바로 안다루고..;ㅂ;
+// 좀 통일성갖도록?
+function updateBalance(userAddr) {
+  console.log(userAddr)
+  getBalance(userAddr, "AVA").done(function(data){
+      // 왜 여기 invalid address????인지 ?????
+      console.log(data);
+      document.getElementById("balance").textContent = data["result"]["balance"];
     });
 }
 
 // Refresh
-function refresh() {
+function refresh(userAddr) {
+  /*
   getRecord(userAddr, userAddr).done(function(msg){
     updateHistory(msg.data.res);
   });
-  updateBalance();
+  */
+  updateBalance(userAddr);
 }
 
 // Update mypage history

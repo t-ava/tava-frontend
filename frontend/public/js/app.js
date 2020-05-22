@@ -239,18 +239,24 @@ function autocomplete(arr) {
      // [TODO] No rent handling ("No rental history!") using rentTime (0, else)
      var returnTime = Math.round((new Date()).getTime()/1000);
      var returnStationID = prompt("Please input the arrival station id", "");
-     // [TODO] time을 통해 추가요금을, requestIncentive 를 통해 incentive를 구하기
-     // requestIncentive(userAddr, returnTime, returnStation, 0, infos);
-     var additionalFee = 7;
-     var incentive = 4;
-     returnBike(USER_ADDR, USER_NAME, USER_PASSWORD, returnStationID, additionalFee, incentive)
-     // [TODO] refresh
-     //refresh();
+     if (returnStationID) {
+       // [TODO] time을 통해 추가요금을, requestIncentive 를 통해 incentive를 구하기
+       // requestIncentive(userAddr, returnTime, returnStation, 0, infos);
+       var additionalFee = 7;
+       var incentive = 4;
+       returnBike(USER_ADDR, USER_NAME, USER_PASSWORD, returnStationID, additionalFee, incentive)
+       refresh(USER_ADDR);
+     }
    });
 
    // refresh button listener
    document.getElementById("refresh").addEventListener("click", function(e) {
-     refresh();
+     refresh(USER_ADDR);
+   });
+
+  // userProfileButton listener
+   document.getElementById("userProfileButton").addEventListener("click", function(e) {
+     refresh(USER_ADDR);
    });
 
   // < Get departure & arrival & targets >

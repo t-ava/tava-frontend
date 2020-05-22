@@ -62,6 +62,22 @@ function getTxStatus(txID) {
 }
 
 /*
+ * 잔고 확인
+ * 이거 잘 되나 테스트해보기. 일단 이 3가지 함수면 기본적 api구현은 끝남
+ */
+function getBalance(address, assetID) {
+  var querydata = '{"jsonrpc": "2.0", "id": 2, "method": "avm.getBalance", "params": {"address": "' + address + '", "assetID": "' + assetID + '"}}';
+  console.log("Get Balance", querydata);
+  return $.ajax({
+    url: NODE,
+    type: 'POST',
+    contentType: 'application/json',
+    processData: false,
+    data: querydata
+  });
+}
+
+/*
  * 유저가 자전거를 하나 빌린다
  * 유저가 기본 렌트비를 지불
  * owner가 빌린 stationID에 대한 bike token을 지급(call giveBikeToken)
@@ -172,39 +188,13 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
 }
 
 /*
- * 잔고 확인
- */
-function balanceOf(from, owner) {
-  var querydata = '{"from": "' + from + '", "inputs": {"owner": "' + owner + '"}}';
-  console.log("balanceOf", querydata);
-  return $.ajax({
-      url: "https://api.luniverse.net/tx/v1.0/transactions/balanceOf",
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-      },
-      type: 'POST',
-      contentType: 'application/json',
-      processData: false,
-      data: querydata,
-      success: function (data) {
-        console.log(JSON.stringify(data));
-        //alert("SUCCESS");
-        return data;
-      },
-      error: function(code) {
-        console.log(code);
-        alert("FAIL");
-      }
-  });
-}
-
-/*
  * 활동 내역 확인
  * 0 - 5원 렌트비 at 10초
  * 1 - 10원 추가 렌트비 at 20초
  * 2 - 15원 인센티브 at 100초
  */
 function getRecord(from, addr) {
+  /*
   var querydata = '{"from": "' + from + '", "inputs": {"addr": "' + addr + '"}}'
   console.log("getRecord", querydata);
   return $.ajax({
@@ -225,6 +215,7 @@ function getRecord(from, addr) {
         alert("FAIL");
       }
   });
+  */
 }
 
 /*
@@ -233,6 +224,7 @@ function getRecord(from, addr) {
  * Else - 대여시간
  */
 function rentTime(from, addr) {
+  /*
   var querydata = '{"from": "' + from + '", "inputs": {"": "' + addr + '"}}'
   console.log("getRecord", querydata);
   return $.ajax({
@@ -253,4 +245,5 @@ function rentTime(from, addr) {
         alert("FAIL");
       }
   });
+  */
 }
