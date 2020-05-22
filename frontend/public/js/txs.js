@@ -116,6 +116,8 @@ function rentBike(useraddr, username, password, stationID, time) {
 		      // 잘 처리되었으므로, rent가 완료됨
                       alert("Payment is now completed!\nplease check the bike token you recieved.");
                       document.getElementById("modal-example").style.display = "none";
+		      // [TODO] DB에 기록 요청
+		      setHistory(useraddr, 'rent', FEE, Math.round((new Date()).getTime()/1000));
 	            }
 	          })}, WAIT_TIME);
               });
@@ -145,6 +147,7 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
           // WAIT_TIME 이후, 추가 렌트비 지불 트랜잭션이 잘 처리되었는지 확인
 	  var txStatus = data["result"]["status"];
 	  if (txStatus == "Accepted") {
+	    setHistory(useraddr, 'return', additional_fee, Math.round((new Date()).getTime()/1000));
             // 잘 처리되었으므로, 이제 bike token을 반환
             sendAsset(1, assetID, OWNER_ADDR, username, password)
               .done(function (data) {
@@ -175,6 +178,7 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
 	                      var txStatus = data["result"]["status"];
 	                      if (txStatus == "Accepted") {
 		                // 잘 처리되었으므로, 성공 팝업 띄움
+		                setHistory(useraddr, 'incentive', incentive, Math.round((new Date()).getTime()/1000));
 	                        alert("Successfully returned!\nPlease check the incentive you've got.")
 			      }
 	                  })}, WAIT_TIME);
@@ -187,63 +191,29 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
     })
 }
 
-/*
- * 활동 내역 확인
- * 0 - 5원 렌트비 at 10초
- * 1 - 10원 추가 렌트비 at 20초
- * 2 - 15원 인센티브 at 100초
- */
-function getRecord(from, addr) {
-  /*
-  var querydata = '{"from": "' + from + '", "inputs": {"addr": "' + addr + '"}}'
-  console.log("getRecord", querydata);
-  return $.ajax({
-      url: "https://api.luniverse.net/tx/v1.0/transactions/getRecord" + version,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-      },
-      type: 'POST',
-      contentType: 'application/json',
-      processData: false,
-      data: querydata,
-      success: function (data) {
-        //console.log(JSON.stringify(data));
-        //alert("SUCCESS");
-      },
-      error: function(code) {
-        console.log(code);
-        alert("FAIL");
-      }
-  });
-  */
-}
 
 /*
- * 대여 시간 확인
- * 0 - 대여X
- * Else - 대여시간
+ * 활동 내역 확인/설정
+ * type : (-)'rent', (-)'return', (+)'incentive'
  */
-function rentTime(from, addr) {
-  /*
-  var querydata = '{"from": "' + from + '", "inputs": {"": "' + addr + '"}}'
-  console.log("getRecord", querydata);
+function setHistory(addr, type, amount, timestamp) {
+  console.log("set History!");
   return $.ajax({
-      url: "https://api.luniverse.net/tx/v1.0/transactions/rentTimes" + version,
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-      },
-      type: 'POST',
-      contentType: 'application/json',
-      processData: false,
-      data: querydata,
-      success: function (data) {
-        //console.log(JSON.stringify(data));
-        //alert("SUCCESS");
-      },
-      error: function(code) {
-        console.log(code);
-        alert("FAIL");
-      }
+    url: 'http://lynx.snu.ac.kr:8084/setHistory',
+    type: 'POST',
+    contentType: 'application/json',
+    processData: false,
+    data: '{"addr": "' + addr + '", "type": "' + type + '", "amount": "' + amount + '", "timestamp": "' + timestamp + '"}'
   });
-  */
+}
+
+function getHistory(addr) {
+  console.log("get History!");
+  return $.ajax({
+    url: 'http://lynx.snu.ac.kr:8084/getHistory',
+    type: 'POST',
+    contentType: 'application/json',
+    processData: false,
+    data: '{"addr": "' + addr + '"}'
+  });
 }

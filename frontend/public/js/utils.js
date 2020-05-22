@@ -145,13 +145,8 @@ function showbody2() {
   document.getElementById("body2").style.display="";
 }
 
-// 여기 userAddr 대신 USER_ADDR 쓰게 해야되는데 이 함수 위치를 어디로 이동하는게 적절할지 생각해보장 ..
-// 왜 얘만 이렇게했지 함수구현을.. 다른애들처럼 클릭했을때 핸들러로 바로 안다루고..;ㅂ;
-// 좀 통일성갖도록?
 function updateBalance(userAddr) {
-  console.log(userAddr)
   getBalance(userAddr, "AVA").done(function(data){
-      // 왜 여기 invalid address????인지 ?????
       console.log(data);
       document.getElementById("balance").textContent = data["result"]["balance"];
     });
@@ -159,11 +154,10 @@ function updateBalance(userAddr) {
 
 // Refresh
 function refresh(userAddr) {
-  /*
-  getRecord(userAddr, userAddr).done(function(msg){
-    updateHistory(msg.data.res);
+  getHistory(userAddr).done(function(msg) {
+    console.log("history msg : ", msg);
+    updateHistory(msg);
   });
-  */
   updateBalance(userAddr);
 }
 
@@ -175,30 +169,31 @@ function updateHistory(data) {
     historyDiv.removeChild(historyDiv.firstChild);
   }
 
-  var N = data[0].length;
+  var N = data.length;
   var listnum = N;
   if (N > 7) {
     listnum = 7;
   }
 
   // Create & update new child
-  for (var i = 1; i <= listnum; i++) {
+  for (var i = 0; i < listnum; i++) {
     var createList = document.createElement('li');
     historyDiv.appendChild(createList);
 
     var icon = '';
     var label = '';
-    var amount = data[1][N-i];
-    var time = data[2][N-i];
+    var type = data[i]["type"];
+    var amount = data[i]["amount"];
+    var time = data[i]["timestamp"];
 
     // Check log type and set icon
-    if (data[0][N-i] == 2) {
+    if (type == "incentive") {
       icon = '<span uk-icon="plus-circle" style="margin-right:5px;"></span>';
       label = '<span class="uk-label" style="background-color:#ffd250;color:#000;font-size: 0.8rem;">보상 ' + amount +'</span>'
-    } else if (data[0][N-i] == 1) {
+    } else if (type == "return") {
       icon = '<span uk-icon="minus-circle" style="margin-right:5px;"></span>';
       label = '<span class="uk-label" style="background-color:#0c7037;color:#fff;font-size: 0.8rem;">사용료 ' + amount +'</span>'
-    } else {
+    } else if (type == "rent") {
       icon = '<span uk-icon="minus-circle" style="margin-right:5px;"></span>';
       label = '<span class="uk-label" style="background-color:#ff1500;color:#fff;font-size: 0.8rem;">대여료 ' + amount +'</span>'
     }
