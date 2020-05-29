@@ -8,7 +8,9 @@
  const OWNER_KEY = '2eEqN4Zsn5z3Qy13RjdAuxUoa8J2dXD6Zo9vS2osY68DLT6Y8E';
  const OWNER_NAME = 'host';
  const OWNER_PASSWORD = 'KDFNEobckav';
- const BIKE_TOKEN_ID = '5nxSnt6DQfBmdfPKEwHqBr8vkDeY48g2UbRSCyenvim4RLkqg';
+ const BIKE_TOKEN_ID = 'pePewnxEaP82Yd7cgnWbGUYgoBjvUwurvhzCLJpqusievGsUN';
+
+ const STATION_ADDR = ['X-PTeTo69Mg7muh5cKEvKW9vZ828GccgJuJ', 'X-3fvugTLJAd61P8cozyanLKg8r6mxEtNCy', 'X-9nDLusvrv1rr6Q19vvkTRrCZNs62TnhNQ', 'X-Q5BkECWU2YoapbXvt3Wb7For2o3iMbTrr', 'X-5SWRUnd2doFx3ZXfivL4fYDCscb3jpg9q'];
 
  const NODE = 'http://satoshi.snu.ac.kr:9650/ext/bc/X';
 
@@ -34,7 +36,7 @@ function sendAsset(amount, assetID, to, username, password) {
 }
 
 function sendAssetFrom(amount, assetID, to, username, password, from) {
-  var querydata = '{"jsonrpc": "2.0", "id": 3, "method": "avm.sendFrom", "params": {"assetID": "' + assetID + '", "amount" :' + amount + ', "to": "' + to + '", "username": "' + username + '", "password": "' + password + '", "from": "' + from + '"}}';
+  var querydata = '{"jsonrpc": "2.0", "id": 3, "method": "avm.send", "params": {"assetID": "' + assetID + '", "amount" :' + amount + ', "to": "' + to + '", "username": "' + username + '", "password": "' + password + '", "from": "' + from + '"}}';
   console.log("Send Asset", querydata);
   return $.ajax({
     url: NODE,
@@ -103,8 +105,8 @@ function rentBike(useraddr, username, password, stationID, time) {
 	  var txStatus = data["result"]["status"];
 	  if (txStatus == "Accepted") {
             // 잘 처리되었으므로, 이제 owner가 bike token을 지급
-	    // [TODO] 지금은 그냥 1에서 보낸다고 상정 
-            sendAssetFrom(1, BIKE_TOKEN_ID, useraddr, OWNER_NAME, OWNER_PASSWORD, 'X-MUSeJpBshrLfonHN674mozTyUMuHkevkV')
+	    // [TODO] 지금은 그냥 [0]에서 보낸다고 상정 
+            sendAssetFrom(1, BIKE_TOKEN_ID, useraddr, OWNER_NAME, OWNER_PASSWORD, STATION_ADDR[0])
               .done(function (data) {
                 if (data["result"] === undefined) {
                   alert("FAIL!\nERROR CODE: rentBike-2");

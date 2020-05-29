@@ -12,6 +12,8 @@ const USER_KEY = 'trUedHL6UDGLgv93yo6EcJ2UZiWhbiHjMCDU2ffJs9PcXvv3h';
 const USER_NAME = 'user1';
 const USER_PASSWORD = 'KDFNEobasfdkav-042!05';
 
+const DEFAULT_INCENTIVE = 5; // standard
+
 /*
  * Query weather & date infos
  */
@@ -239,13 +241,17 @@ function autocomplete(arr) {
      // [TODO] No rent handling ("No rental history!") using rentTime (0, else)
      var returnTime = Math.round((new Date()).getTime()/1000);
      var returnStationID = prompt("Please input the arrival station id", "");
+     var returnStation = [ returnStationID ];
      if (returnStationID) {
        // [TODO] time을 통해 추가요금을, requestIncentive 를 통해 incentive를 구하기
        // requestIncentive(userAddr, returnTime, returnStation, 0, infos);
-       var additionalFee = 7;
-       var incentive = 4;
-       returnBike(USER_ADDR, USER_NAME, USER_PASSWORD, returnStationID, additionalFee, incentive)
-       refresh(USER_ADDR);
+       requestPredict(returnStation, 0).done(function(msg) {
+    		console.log("request result : ", msg);
+		var incentive = DEFAULT_INCENTIVE - msg["res"][0];
+	        var additionalFee = 5;
+	        returnBike(USER_ADDR, USER_NAME, USER_PASSWORD, returnStationID, additionalFee, incentive)
+	        refresh(USER_ADDR);
+       });
      }
    });
 
@@ -295,31 +301,30 @@ function autocomplete(arr) {
     console.log("4. Open spinner (loading status)");
     document.getElementById("spinner").style.display="";
     document.getElementById("go").style.display="none";
-    callback(targetIDs, travelTimes, getPredictResult);
+    callback(targetIDs, travelTimes);
   }
 
   // Send expected arrival time & target id by Tx
-  function sendPredictTx(targetIDs, travelTimes, callback) {
+  function sendPredictTx(targetIDs, travelTimes) {
     console.log("5. Send predict tx with timestamp [todo]");
-    var reqTime = Math.round((new Date()).getTime()/1000);
+    //var reqTime = Math.round((new Date()).getTime()/1000);
     // [TODO] AVA 미구현이므로 result 대충 다 999로 푸시하고 renderMap 해보기
+    /*
     for (var i = 0; i < targets.length; i++) {
       targets[i].push(999);
     }
     renderMap();
+    */
     console.log("targets:", targets)
-    //requestPredict(userAddr, reqTime, targetIDs, travelTimes, infos, callback);
-  }
-
-  // < Get reply tx and update map>
-  // Get (target station id, incentive)
-  function getPredictResult(data, callback) {
-    console.log("6. Get predict result");
-    for (var i = 0; i < targets.length; i++) {
-      targets[i].push(data.data.res[2][i]);
-    }
-    // 이 콜백이 updateMap() 임
-    callback();
+    console.log("trael times:", travelTimes)
+    requestPredict(targetIDs, travelTimes[0]).done(function(msg) {
+    	console.log("request result : ", msg);
+	result = msg["res"]; // negative : high incentive , positive : low incentive
+    	for (var i = 0; i < targets.length; i++) {
+		targets[i].push(DEFAULT_INCENTIVE - result[i]);
+    	}
+	renderMap(); // updateMap here
+    });
   }
 
   var firstMarker;
@@ -419,62 +424,26 @@ function autocomplete(arr) {
     updateMap()
   }
 
-  function requestPredict(from, reqTime, targetIDs, travelTimes, infos, callback) {
-    var querydata = '{"from": "' + from + '","inputs": {"_reqTime": "'
-          + reqTime + '","_stations": [' + targetIDs + '],"_arriveTimes": [' + travelTimes + '],"_infos": [' + infos + ']}}';
+  function requestPredict(targetIDs, travelTime) {
+    // 희망 도착지 기준으로 request
+    var now = new Date();
+    var day = now.getDay()-1
+    if (day == -1) day = 6
+    var month = now.getMonth() + 1
+    var hour = now.getHours() + travelTime
+    if (hour >= 24) {
+        day = (day + hour / 24) % 7
+	hour = hour % 24
+    }
+    var querydata = '{"month": ' + month + ', "weekday": ' + day + ', "hour": ' + hour + ', "ids": [' + targetIDs + '], "adj":' + 1 + '}';
+    console.log("querydata = ", querydata)
 
     return $.ajax({
-        url: "https://api.luniverse.net/tx/v1.0/transactions/requestInference" + version,
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-        },
+	url: "http://satoshi.snu.ac.kr:8327/post",
         type: 'POST',
         contentType: 'application/json',
-        processData: false,
-        data: querydata,
-        success: function (data) {
-          // get Response
-          // 지도 초기화
-          // 지도 중심 계산
-          let lat_center = parseFloat(targets[0][LAT]);
-          let long_center = parseFloat(targets[0][LONG]);
-	  /*
-	  // No more use leaflet (L.~)
-          L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox.streets',
-	    // 2020.05.19 yeonjae
-            accessToken: 'pk.eyJ1IjoicmljZWdvZCIsImEiOiJja2FkaDl4MzAyNWViMnNteDNzdzdqbHUxIn0.0eLBipR8sNJ87SU2xJGSOA'
-          }).addTo(map);
-	  */
-          setTimeout(function () {getResponse(userAddr, reqTime, callback)}, 3000);
-        },
-        error: function(){
-          console.log("Cannot get data");
-        }
-    });
-  }
-
-  function getResponse(from, reqTime, callback) {
-    var querydata = '{"from": "' + from + '", "inputs": {"requestID": "' + from + reqTime + '"}}'
-    console.log("getresponse",querydata);
-    return $.ajax({
-        url: "https://api.luniverse.net/tx/v1.0/transactions/getResponse" + version,
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader('Authorization', 'Bearer SfnBZUboFmWwav6CkYJrkyEQGp77qLJzhQ4hcmumhd8CYbp7z9hiRDex7jDaLgvr');
-        },
-        type: 'POST',
-        contentType: 'application/json',
-        processData: false,
-        data: querydata,
-        success: function (data) {
-          console.log("Predict result", JSON.stringify(data));
-          callback(data, updateMap);
-        },
-        error: function(code) {
-          setTimeout(function () {getResponse(from, reqTime, callback)}, 1000);
-        }
+	processData: false,
+        data: querydata
     });
   }
 }
