@@ -190,13 +190,13 @@ function updateHistory(data) {
     // Check log type and set icon
     if (type == "incentive") {
       icon = '<span uk-icon="plus-circle" style="margin-right:5px;"></span>';
-      label = '<span class="uk-label" style="background-color:#ffd250;color:#000;font-size: 0.8rem;">보상 ' + amount +'</span>'
+      label = '<span class="uk-label" style="background-color:#ffd250;color:#000;font-size: 0.8rem;">Incentive ' + amount +'</span>'
     } else if (type == "return") {
       icon = '<span uk-icon="minus-circle" style="margin-right:5px;"></span>';
-      label = '<span class="uk-label" style="background-color:#0c7037;color:#fff;font-size: 0.8rem;">사용료 ' + amount +'</span>'
+      label = '<span class="uk-label" style="background-color:#0c7037;color:#fff;font-size: 0.8rem;">Fee ' + amount +'</span>'
     } else if (type == "rent") {
       icon = '<span uk-icon="minus-circle" style="margin-right:5px;"></span>';
-      label = '<span class="uk-label" style="background-color:#ff1500;color:#fff;font-size: 0.8rem;">대여료 ' + amount +'</span>'
+      label = '<span class="uk-label" style="background-color:#ff1500;color:#fff;font-size: 0.8rem;">Rent ' + amount +'</span>'
     }
 
     // Print icon - amount - time

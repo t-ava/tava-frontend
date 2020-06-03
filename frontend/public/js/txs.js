@@ -36,7 +36,7 @@ function sendAsset(amount, assetID, to, username, password) {
 }
 
 function sendAssetFrom(amount, assetID, to, username, password, from) {
-  var querydata = '{"jsonrpc": "2.0", "id": 3, "method": "avm.send", "params": {"assetID": "' + assetID + '", "amount" :' + amount + ', "to": "' + to + '", "username": "' + username + '", "password": "' + password + '", "from": "' + from + '"}}';
+  var querydata = '{"jsonrpc": "2.0", "id": 3, "method": "avm.send", "params": {"assetID": "' + assetID + '", "amount" :' + amount + ', "to": "' + to + '", "username": "' + username + '", "password": "' + password + '", "froms": ["' + from + '"]}}';
   console.log("Send Asset", querydata);
   return $.ajax({
     url: NODE,
