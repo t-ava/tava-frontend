@@ -1,6 +1,7 @@
 # :bike:Tava
 ## Tava-Frontend
 ![](images/preview.gif)
+> Only *Ditibike* test available
 
 ### Overview
 * `/index.html`: Main layout
