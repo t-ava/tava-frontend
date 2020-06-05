@@ -204,7 +204,7 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
 function setHistory(addr, type, amount, timestamp) {
   console.log("set History!");
   return $.ajax({
-    url: 'http://lynx.snu.ac.kr:8084/setHistory',
+    url: '/setHistory',
     type: 'POST',
     contentType: 'application/json',
     processData: false,
@@ -215,7 +215,7 @@ function setHistory(addr, type, amount, timestamp) {
 function getHistory(addr) {
   console.log("get History!");
   return $.ajax({
-    url: 'http://lynx.snu.ac.kr:8084/getHistory',
+    url: '/getHistory',
     type: 'POST',
     contentType: 'application/json',
     processData: false,

@@ -14,6 +14,8 @@ const USER_PASSWORD = 'KDFNEobasfdkav-042!05';
 
 const DEFAULT_INCENTIVE = 5; // standard
 
+const DNN_SERVER = 'http://satoshi.snu.ac.kr:8327/post';
+
 /*
  * Query weather & date infos
  */
@@ -439,7 +441,7 @@ function autocomplete(arr) {
     console.log("querydata = ", querydata)
 
     return $.ajax({
-	url: "http://satoshi.snu.ac.kr:8327/post",
+	url: DNN_SERVER,
         type: 'POST',
         contentType: 'application/json',
 	processData: false,
