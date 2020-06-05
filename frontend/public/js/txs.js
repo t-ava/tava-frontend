@@ -10,7 +10,7 @@
  const OWNER_PASSWORD = 'KDFNEobckav';
  const BIKE_TOKEN_ID = 'pePewnxEaP82Yd7cgnWbGUYgoBjvUwurvhzCLJpqusievGsUN';
 
- const STATION_ADDR = ['X-PTeTo69Mg7muh5cKEvKW9vZ828GccgJuJ', 'X-3fvugTLJAd61P8cozyanLKg8r6mxEtNCy', 'X-9nDLusvrv1rr6Q19vvkTRrCZNs62TnhNQ', 'X-Q5BkECWU2YoapbXvt3Wb7For2o3iMbTrr', 'X-5SWRUnd2doFx3ZXfivL4fYDCscb3jpg9q'];
+ const STATION_ADDR = ['X-A9e3iJbYC4tRdhGV56QPjHNuWyE7Ao7jG', 'X-FC1R55muJFHuTHtMGbvENkNGLCqks1fVZ', 'X-8qozToj6mrGWuGMqD2gy9xySvj68nsBnZ', 'X-3gemEc753hjpWDe4TWFg65xx8xc6MzwvE', 'X-AkpWeXduP5Xkio1ouu1bytH6ksMiNue7D', 'X-BBZpBYNqdWiFmv3PB1fZSBawCDKByhisv', 'X-KvojiLf6QvQPsikFY3WEKbKFED7eA6MAQ', 'X-HRbnGVZEzN774JeSkbRzLQtYRz7wkkUNQ', 'X-9TH3dun9M71g1ymXX4pCJJxpkvMemrMGS', 'X-gRUq2JVEyTmUbxg7zkBzLwqfoshVao5r', 'X-LZCgKuqqRB9s5zHH1nbJc4TCiKcMm9ZKk', 'X-N5APzZUVyitRdQGtLm6cUhfW9K6vRb2KZ', 'X-Ji7DGdcjX9muM1W6hrbexQe4AKDzGU9ua', 'X-AQfdthXkvhA4ohL6rBGSEcwVXyc61YAHS', 'X-81TkjECnMzh8GXNs9WgDT7nG8rcswVtav', 'X-MrdJVdqgE8N7ta3taan9hmv8wDjBGmGGY', 'X-P3Km8LoMKGYZEA2Y789SofjL7oJtp4XVU', 'X-8C9cbgFGckdZnwfA9kufYanrfao6svKfY', 'X-8TwxXH8SUM6xQjqQVx9dQFnoMcNHxZufQ', 'X-4ZcBs4D9fEw5kSBmpSn1toWfec1RHPYva'];
 
  const NODE = 'http://satoshi.snu.ac.kr:9650/ext/bc/X';
 
@@ -105,8 +105,10 @@ function rentBike(useraddr, username, password, stationID, time) {
 	  var txStatus = data["result"]["status"];
 	  if (txStatus == "Accepted") {
             // 잘 처리되었으므로, 이제 owner가 bike token을 지급
-	    // [TODO] 지금은 그냥 [0]에서 보낸다고 상정 
-            sendAssetFrom(1, BIKE_TOKEN_ID, useraddr, OWNER_NAME, OWNER_PASSWORD, STATION_ADDR[0])
+	    // [TODO] 지금은 그냥 20개 station addr 밖에 없으니 modular를 통해 보내고 받는다
+	    stationAddr = STATION_ADDR[stationID % STATION_ADDR.length];
+	    console.log("rent stationID = ", stationID, ", index = ", stationID % STATION_ADDR.length, ", station addr = ", stationAddr)
+            sendAssetFrom(1, BIKE_TOKEN_ID, useraddr, OWNER_NAME, OWNER_PASSWORD, stationAddr)
               .done(function (data) {
                 if (data["result"] === undefined) {
                   alert("FAIL!\nERROR CODE: rentBike-2");
@@ -154,8 +156,10 @@ function returnBike(useraddr, username, password, stationID, additional_fee, inc
 	  if (txStatus == "Accepted") {
 	    setHistory(useraddr, 'return', additional_fee, Math.round((new Date()).getTime()/1000));
             // 잘 처리되었으므로, 이제 bike token을 반환
-	    // [TODO] 지금은 2에 반납한다고 상정 
-            sendAsset(1, BIKE_TOKEN_ID, 'X-5vnaaAgRUXnEnw45KWUua5yk6N8sA81HZ', username, password)
+	    // [TODO] 지금은 그냥 20개 station addr 밖에 없으니 modular를 통해 보내고 받는다
+	    stationAddr = STATION_ADDR[stationID % STATION_ADDR.length];
+	    console.log("return stationID = ", stationID, ", index = ", stationID % STATION_ADDR.length, ", station addr = ", stationAddr)
+            sendAsset(1, BIKE_TOKEN_ID, stationAddr, username, password)
               .done(function (data) {
                 if (data["result"] === undefined) {
                   alert("FAIL!\nERROR CODE: returnBike-2");
